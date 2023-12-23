@@ -26,13 +26,13 @@ public class FetchRandomWordUseCase implements UseCase<FetchRandomWordUseCaseReq
                 .orElseThrow(() -> new RuntimeException("Word Source Not Found"));
         int size = wordSource.getWords().size();
         Random random = new Random();
-        Word word = wordSource.getWords().get(random.nextInt(size)-1);
+        Word word = wordSource.getWords().get(random.nextInt(size-1));
 
         Set<String> choiceSet = new HashSet<>();
         choiceSet.add(word.getDestinationLanguageMeaning());
 
         while (choiceSet.size() < 4) {
-            choiceSet.add(wordSource.getWords().get(random.nextInt(size) - 1).getDestinationLanguageMeaning());
+            choiceSet.add(wordSource.getWords().get(random.nextInt(size - 1)).getDestinationLanguageMeaning());
         }
         List<String> choices = new ArrayList<>(choiceSet);
 

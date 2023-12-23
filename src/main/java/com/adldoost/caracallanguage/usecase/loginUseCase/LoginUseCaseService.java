@@ -6,6 +6,7 @@ import com.adldoost.caracallanguage.security.IAMClaims;
 import com.adldoost.caracallanguage.security.JwtUtil;
 import com.adldoost.caracallanguage.usecase.UseCase;
 import io.jsonwebtoken.Claims;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,6 +41,8 @@ public class LoginUseCaseService implements UseCase<LoginUseCaseRequest, LoginUs
                     throw new AccessDeniedException("incorrect password");
                 }
             });
+        } else {
+            throw new AccessDeniedException("user not found");
         }
         return generateTokenForUser(user.get());
     }
@@ -64,3 +67,17 @@ public class LoginUseCaseService implements UseCase<LoginUseCaseRequest, LoginUs
         return calendar.getTime();
     }
 }
+
+//    @PostConstruct
+//    public void generateAdminUser() {
+//        User user = new User()
+//                .setFirstName("Admin")
+//                .setLastName("Admin")
+//                .setUsername("admin")
+//                .setPassword(passwordEncoder.encode("adminadmin"))
+//                .setMobile("09143471899")
+//                .setNationalId("0000000000")
+//                .setSignupDate(LocalDateTime.now());
+//        userRepository.save(user);
+//    }
+//}
