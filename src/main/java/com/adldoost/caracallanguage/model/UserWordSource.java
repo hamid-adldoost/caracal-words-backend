@@ -29,5 +29,6 @@ public class UserWordSource implements Serializable {
     private String sourceTitle;
     private String sourceDescription;
     private List<UserWord> userWords;
+    private List<UserWord> learningBox;
 
 }
