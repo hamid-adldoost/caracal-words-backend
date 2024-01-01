@@ -1,4 +1,4 @@
-package com.adldoost.caracallanguage.usecase.fetchFromLearningBox;
+package com.adldoost.caracallanguage.usecase.fetchFromLearningBox.dto;
 
 import com.adldoost.caracallanguage.usecase.fetchRandomWord.dto.FetchRandomWordUseCaseResponse;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

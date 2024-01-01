@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface UserWordSourceRepository extends MongoRepository<UserWordSource, String> {
 
-    Optional<UserWordSource> findByWordSourceIdAndUser(String id, String user);
+    Optional<UserWordSource> findByWordSourceIdAndUser(String wordSourceId, String user);
+    Optional<UserWordSource> findByIdAndUser(String id, String user);
 
 }

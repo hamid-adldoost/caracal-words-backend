@@ -2,25 +2,20 @@ package com.adldoost.caracallanguage.usecase.fetchFromLearningBox;
 
 import com.adldoost.caracallanguage.model.UserWord;
 import com.adldoost.caracallanguage.model.UserWordSource;
-import com.adldoost.caracallanguage.model.Word;
 import com.adldoost.caracallanguage.repository.UserWordSourceRepository;
 import com.adldoost.caracallanguage.usecase.UseCase;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.adldoost.caracallanguage.usecase.fetchFromLearningBox.dto.FetchFromLearningBoxRequest;
+import com.adldoost.caracallanguage.usecase.fetchFromLearningBox.dto.FetchFromLearningBoxResponse;
+import com.adldoost.caracallanguage.usecase.fetchRandomChoiceUseCase.dto.FetchRandomChoiceRequest;
+import com.adldoost.caracallanguage.usecase.fetchRandomChoiceUseCase.dto.FetchRandomChoiceResponse;
+import com.adldoost.caracallanguage.usecase.fetchRandomChoiceUseCase.FetchRandomChoiceUseCase;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.*;
 
 
 @Component
@@ -29,23 +24,37 @@ import java.util.stream.Collectors;
 public class FetchFromLearningBoxUseCase implements UseCase<FetchFromLearningBoxRequest, FetchFromLearningBoxResponse> {
 
     private final UserWordSourceRepository userWordSourceRepository;
+    private final FetchRandomChoiceUseCase fetchRandomChoiceUseCase;
+
     @Override
     public FetchFromLearningBoxResponse execute(FetchFromLearningBoxRequest request) {
 
-        UserWordSource userWordSource = userWordSourceRepository.findByWordSourceIdAndUser(request.getUserWordSourceId(),
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
+        UserWordSource userWordSource = userWordSourceRepository.findByIdAndUser(
+                        request.getUserWordSourceId(),
+                        SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString())
                 .orElseThrow(() -> new RuntimeException("user word source not found"));
-        if(CollectionUtils.isEmpty(userWordSource.getLearningBox())) {
+        if (CollectionUtils.isEmpty(userWordSource.getLearningBox())) {
             generateLearningBox(userWordSource);
         }
-        if(request.getIndex() > (userWordSource.getLearningBox().size()-1)) {
+        if (request.getIndex() > (userWordSource.getLearningBox().size() - 1)) {
             throw new RuntimeException("invalid index");
         }
         UserWord selectedWord = userWordSource.getLearningBox().get(request.getIndex());
-        return new FetchFromLearningBoxResponse()
-                .setLearningBoxSize(userWordSource.getLearningBox().size())
-                .setScore(selectedWord.getScore())
-                .setChoices();
+        FetchRandomChoiceResponse response = fetchRandomChoiceUseCase.execute(new FetchRandomChoiceRequest(4, selectedWord.getWord().getDestinationLanguageMeaning()));
+        response.getChoices().add(selectedWord.getWord().getDestinationLanguageMeaning());
+        FetchFromLearningBoxResponse learningBoxResponse = new FetchFromLearningBoxResponse();
+        learningBoxResponse.setLearningBoxSize(userWordSource.getLearningBox().size());
+        learningBoxResponse.setScore(selectedWord.getScore());
+        learningBoxResponse.setChoices(new ArrayList<>(response.getChoices()));
+        Collections.shuffle(learningBoxResponse.getChoices());
+        learningBoxResponse.setExamples(selectedWord.getWord().getExamples());
+        learningBoxResponse.setPronunciation(selectedWord.getWord().getPronunciation());
+        learningBoxResponse.setDestinationLanguageMeaning(selectedWord.getWord().getDestinationLanguageMeaning());
+        learningBoxResponse.setOriginalWord(selectedWord.getWord().getOriginalWord());
+        learningBoxResponse.setSourceId(userWordSource.getWordSourceId());
+        learningBoxResponse.setSourceLanguageMeaning(selectedWord.getWord().getSourceLanguageMeaning());
+        learningBoxResponse.setWordId(selectedWord.getWord().getId());
+        return learningBoxResponse;
     }
 
     private void generateLearningBox(UserWordSource userWordSource) {
@@ -61,6 +70,8 @@ public class FetchFromLearningBoxUseCase implements UseCase<FetchFromLearningBox
             unLearned.remove(word);
             learningBox.add(word);
         }
+        userWordSource.setLearningBox(learningBox);
+        userWordSourceRepository.save(userWordSource);
 
     }
 }

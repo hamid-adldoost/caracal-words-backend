@@ -1,4 +1,4 @@
-package com.adldoost.caracallanguage.usecase.fetchRandomChoiceUseCase;
+package com.adldoost.caracallanguage.usecase.fetchFromLearningBox.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -7,15 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class FetchRandomChoiceResponse implements Serializable {
+public class FetchFromLearningBoxRequest implements Serializable {
 
-    Set<String> choices;
+    private String userWordSourceId;
+    private Integer index;
 }
