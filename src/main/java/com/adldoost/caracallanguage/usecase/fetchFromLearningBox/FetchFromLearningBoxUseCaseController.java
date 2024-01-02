@@ -16,7 +16,7 @@ public class FetchFromLearningBoxUseCaseController {
     private final FetchFromLearningBoxUseCase useCase;
 
 
-    @GetMapping("/{userWordSourceId}")
+    @GetMapping(value = "/{userWordSourceId}", produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
     public FetchFromLearningBoxResponse fetchFromLearningBox(@PathVariable String userWordSourceId,
                                                              @RequestParam Integer index) {

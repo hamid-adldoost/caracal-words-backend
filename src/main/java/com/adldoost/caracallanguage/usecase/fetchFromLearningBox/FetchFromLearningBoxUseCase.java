@@ -54,6 +54,7 @@ public class FetchFromLearningBoxUseCase implements UseCase<FetchFromLearningBox
         learningBoxResponse.setSourceId(userWordSource.getWordSourceId());
         learningBoxResponse.setSourceLanguageMeaning(selectedWord.getWord().getSourceLanguageMeaning());
         learningBoxResponse.setWordId(selectedWord.getWord().getId());
+        learningBoxResponse.setLearningBoxSize(userWordSource.getLearningBox().size());
         return learningBoxResponse;
     }
 

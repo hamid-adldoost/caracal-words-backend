@@ -17,5 +17,5 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FetchRandomChoiceResponse implements Serializable {
 
-    Set<String> choices;
+    private Set<String> choices;
 }

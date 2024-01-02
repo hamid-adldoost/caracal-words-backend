@@ -15,7 +15,7 @@ public class SubmitLearningBoxExamResultController {
 
     private final SubmitLearningBoxExamResultUseCase useCase;
 
-    @PostMapping()
+    @PostMapping(produces = "application/json;charset=UTF-8")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public SubmitLearningBoxExamResultResponse submitResult(@RequestBody SubmitLearningBoxExamResultRequest request) {
         return useCase.execute(request);
