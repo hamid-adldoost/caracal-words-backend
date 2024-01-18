@@ -45,6 +45,8 @@ public class FetchFromLearningBoxUseCase implements UseCase<FetchFromLearningBox
         FetchFromLearningBoxResponse learningBoxResponse = new FetchFromLearningBoxResponse();
         learningBoxResponse.setLearningBoxSize(userWordSource.getLearningBox().size());
         learningBoxResponse.setScore(selectedWord.getScore());
+        learningBoxResponse.setCorrectAnswerCount(selectedWord.getCorrectAnswerCount());
+        learningBoxResponse.setInCorrectAnswerCount(selectedWord.getInCorrectAnswerCount());
         learningBoxResponse.setChoices(new ArrayList<>(response.getChoices()));
         Collections.shuffle(learningBoxResponse.getChoices());
         learningBoxResponse.setExamples(selectedWord.getWord().getExamples());
@@ -66,13 +68,23 @@ public class FetchFromLearningBoxUseCase implements UseCase<FetchFromLearningBox
         List<UserWord> unLearned = new ArrayList<>(userWordSource.getUserWords().stream().filter(w -> w.getScore() < 10)
                 .toList());
         while ((learningBox.size() < learningBoxSize) && unLearned.size() > 0) {
-            Random random = new Random();
-            UserWord word = unLearned.get(random.nextInt(unLearned.size() - 1));
+            UserWord word = selectRandomWord(unLearned);
             unLearned.remove(word);
             learningBox.add(word);
         }
         userWordSource.setLearningBox(learningBox);
         userWordSourceRepository.save(userWordSource);
 
+    }
+
+    private static UserWord selectRandomWord(List<UserWord> unLearned) {
+        Random random = new Random();
+        UserWord word;
+        if(unLearned.size() > 1) {
+            word = unLearned.get(random.nextInt(unLearned.size() - 1));
+        } else {
+            word = unLearned.get(0);
+        }
+        return word;
     }
 }

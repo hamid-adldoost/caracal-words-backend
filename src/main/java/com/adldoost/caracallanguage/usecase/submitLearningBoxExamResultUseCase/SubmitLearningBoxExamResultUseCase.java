@@ -38,8 +38,10 @@ public class SubmitLearningBoxExamResultUseCase implements UseCase<SubmitLearnin
          //update word score
         if (request.getResult()) {
             userWord.setScore(userWord.getScore() + 1);
+            userWord.setCorrectAnswerCount(userWord.getCorrectAnswerCount()+1);
         } else {
             userWord.setScore(userWord.getScore() - 1);
+            userWord.setInCorrectAnswerCount(userWord.getInCorrectAnswerCount()+1);
         }
 
         //replace word with a new word if score is >= 10
@@ -57,7 +59,9 @@ public class SubmitLearningBoxExamResultUseCase implements UseCase<SubmitLearnin
         //update word in user words
         userWordSource.getUserWords().stream().filter(w -> w.getWord().getId().equals(userWord.getWord().getId()))
                 .findFirst().orElseThrow(() -> new RuntimeException("word not found in user words"))
-                .setScore(userWord.getScore());
+                .setScore(userWord.getScore())
+                .setCorrectAnswerCount(userWord.getCorrectAnswerCount())
+                .setInCorrectAnswerCount(userWord.getInCorrectAnswerCount());
         userWordSourceRepository.save(userWordSource);
         return new SubmitLearningBoxExamResultResponse().setLearningBoxSize(userWordSource.getLearningBox().size());
     }

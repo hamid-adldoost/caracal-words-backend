@@ -5,23 +5,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserWord implements Serializable {
+public class UserActivity implements Serializable {
 
-    private Word word;
-    private Integer score;
-    private Integer correctAnswerCount;
-    private Integer inCorrectAnswerCount;
-    private Map<LocalDateTime, Boolean> reviewResultMap;
+    @Id
+    private String id;
+    private String userId;
+    private LocalDateTime activityDate;
+    private UserActivityType activityType;
+    private String description;
+
 }

@@ -16,5 +16,6 @@ public class FetchFromLearningBoxResponse extends FetchRandomWordUseCaseResponse
 
     private int learningBoxSize;
     private int score;
-
+    private int correctAnswerCount;
+    private int inCorrectAnswerCount;
 }
