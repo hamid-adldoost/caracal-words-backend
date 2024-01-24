@@ -1,8 +1,13 @@
 package com.adldoost.caracallanguage.usecase.submitLearningBoxExamResultUseCase;
 
+import com.adldoost.caracallanguage.model.User;
+import com.adldoost.caracallanguage.model.UserFacilityType;
 import com.adldoost.caracallanguage.model.UserWord;
 import com.adldoost.caracallanguage.model.UserWordSource;
+import com.adldoost.caracallanguage.repository.UserRepository;
 import com.adldoost.caracallanguage.repository.UserWordSourceRepository;
+import com.adldoost.caracallanguage.usecase.IncreaseUserFacilitiesUseCase.IncreaseUserFacilitiesUseCase;
+import com.adldoost.caracallanguage.usecase.IncreaseUserFacilitiesUseCase.IncreaseUserFacilitiesUseCaseRequestDto;
 import com.adldoost.caracallanguage.usecase.UseCase;
 import com.adldoost.caracallanguage.usecase.submitLearningBoxExamResultUseCase.dto.SubmitLearningBoxExamResultRequest;
 import com.adldoost.caracallanguage.usecase.submitLearningBoxExamResultUseCase.dto.SubmitLearningBoxExamResultResponse;
@@ -19,6 +24,8 @@ import java.util.Collections;
 public class SubmitLearningBoxExamResultUseCase implements UseCase<SubmitLearningBoxExamResultRequest, SubmitLearningBoxExamResultResponse> {
 
     private final UserWordSourceRepository userWordSourceRepository;
+    private final UserRepository userRepository;
+    private final IncreaseUserFacilitiesUseCase increaseUserFacilitiesUseCase;
 
     @Override
     public SubmitLearningBoxExamResultResponse execute(SubmitLearningBoxExamResultRequest request) {
@@ -63,6 +70,18 @@ public class SubmitLearningBoxExamResultUseCase implements UseCase<SubmitLearnin
                 .setCorrectAnswerCount(userWord.getCorrectAnswerCount())
                 .setInCorrectAnswerCount(userWord.getInCorrectAnswerCount());
         userWordSourceRepository.save(userWordSource);
+
+        increaseUserPoints(request.getResult(), userWordSource);
+
         return new SubmitLearningBoxExamResultResponse().setLearningBoxSize(userWordSource.getLearningBox().size());
+    }
+
+    private void increaseUserPoints(Boolean result, UserWordSource userWordSource) {
+        User user = userRepository.findByUsername(userWordSource.getUser()).orElseThrow(()-> new RuntimeException("User not found"));
+        //increase (decrease) user facilities
+        increaseUserFacilitiesUseCase.execute(new IncreaseUserFacilitiesUseCaseRequestDto()
+                        .setUserId(user.getId())
+                .setFacilityType(UserFacilityType.POINTS))
+                .setFacilityResultCount(result ? +1 : -1);
     }
 }
